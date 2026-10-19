@@ -29,7 +29,14 @@ Cross-platform C++ baseline for reliable file transfer over UDP sockets. Impleme
 
 ### 🚀 How to Run Local Baseline Test
 
-#### 1. Build and Run Receiver
+#### On Windows (MinGW / PowerShell)
+Open two separate PowerShell terminal windows in the project directory:
+
 ```powershell
+# Terminal 1 - Build and Run Receiver
 g++ receiver_base.cpp -o receiver.exe -lws2_32
 .\receiver.exe
+
+# Terminal 2 - Build and Run Sender
+g++ sender_base.cpp -o sender.exe -lws2_32
+.\sender.exe
