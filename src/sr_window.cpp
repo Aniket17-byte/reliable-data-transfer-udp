@@ -98,11 +98,13 @@ bool SrSenderWindow::process_sack(const SackInfo& sack) {
     uint32_t old_base = send_base_;
 
     // 1. Process cumulative ACK (all packets up to and including cumulative_ack are ACKed)
-    for (uint32_t s = send_base_; s <= sack.cumulative_ack; ++s) {
-        auto it = window_buffer_.find(s);
-        if (it != window_buffer_.end()) {
-            it->second.state = SrPacketState::ACKED;
-            timer_manager_.stop_timer(s);
+    if (sack.has_cumulative_ack) {
+        for (uint32_t s = send_base_; s <= sack.cumulative_ack; ++s) {
+            auto it = window_buffer_.find(s);
+            if (it != window_buffer_.end()) {
+                it->second.state = SrPacketState::ACKED;
+                timer_manager_.stop_timer(s);
+            }
         }
     }
 
@@ -119,9 +121,10 @@ bool SrSenderWindow::process_sack(const SackInfo& sack) {
 
     // 3. Process bitmask
     if (sack.bitmask != 0) {
+        uint32_t base_ref = sack.has_cumulative_ack ? (sack.cumulative_ack + 1) : send_base_;
         for (uint64_t i = 0; i < 64; ++i) {
             if (sack.bitmask & (1ULL << i)) {
-                uint32_t s = sack.cumulative_ack + 1 + static_cast<uint32_t>(i);
+                uint32_t s = base_ref + static_cast<uint32_t>(i);
                 auto it = window_buffer_.find(s);
                 if (it != window_buffer_.end()) {
                     it->second.state = SrPacketState::ACKED;
@@ -221,7 +224,13 @@ SrReceiverWindow::ProcessResult SrReceiverWindow::process_packet(uint32_t seq_nu
 
 SackInfo SrReceiverWindow::generate_sack_info() const {
     SackInfo sack;
-    sack.cumulative_ack = rcv_base_ > 0 ? rcv_base_ - 1 : 0;
+    if (rcv_base_ > 0) {
+        sack.has_cumulative_ack = true;
+        sack.cumulative_ack = rcv_base_ - 1;
+    } else {
+        sack.has_cumulative_ack = false;
+        sack.cumulative_ack = 0;
+    }
     sack.bitmask = 0;
 
     if (rcv_buffer_.empty()) {
@@ -230,10 +239,12 @@ SackInfo SrReceiverWindow::generate_sack_info() const {
 
     // Build contiguous SACK blocks from sorted map
     std::optional<SackBlock> current_block;
+    uint32_t base_ref = sack.has_cumulative_ack ? (sack.cumulative_ack + 1) : rcv_base_;
+
     for (const auto& [seq, _] : rcv_buffer_) {
-        // Also update 64-bit mask relative to cumulative_ack + 1
-        if (seq > sack.cumulative_ack) {
-            uint64_t diff = static_cast<uint64_t>(seq - sack.cumulative_ack - 1);
+        // Also update 64-bit mask relative to base_ref
+        if (seq >= base_ref) {
+            uint64_t diff = static_cast<uint64_t>(seq - base_ref);
             if (diff < 64) {
                 sack.bitmask |= (1ULL << diff);
             }

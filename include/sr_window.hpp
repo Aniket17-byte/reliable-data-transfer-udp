@@ -43,9 +43,10 @@ struct SackBlock {
  * @brief SACK structure containing cumulative base acknowledgment plus selective blocks.
  */
 struct SackInfo {
+    bool has_cumulative_ack{false};    // True if at least one packet has been cumulatively received
     uint32_t cumulative_ack{0};        // All packets up to and including this are received
     std::vector<SackBlock> blocks;     // Disjoint out-of-order received blocks
-    uint64_t bitmask{0};               // Compact 64-bit window mask relative to cumulative_ack + 1
+    uint64_t bitmask{0};               // Compact 64-bit window mask relative to cumulative_ack + 1 (or rcv_base)
 };
 
 /**
