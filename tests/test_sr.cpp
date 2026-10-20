@@ -109,7 +109,7 @@ void test_sack_blocks_and_processing() {
     receiver.process_packet(4, {'Z'});
 
     auto sack = receiver.generate_sack_info();
-    assert(sack.cumulative_ack == 0);
+    assert(!sack.has_cumulative_ack);
     // Should have 2 blocks: [1, 1] and [3, 4]
     assert(sack.blocks.size() == 2);
     assert(sack.blocks[0].start_seq == 1 && sack.blocks[0].end_seq == 1);
