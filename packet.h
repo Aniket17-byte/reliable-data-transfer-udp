@@ -70,15 +70,14 @@ inline void serialize_packet(Packet& pkt) {
 inline bool deserialize_packet(Packet& pkt) {
     uint16_t received_checksum = ntohs(pkt.header.checksum);
     
-    // Restore host order for fields needed to recalculate checksum
+    // Restore host order for fields needed to recalculate checksum (matching serialize_packet)
+    pkt.header.seq_num = ntohl(pkt.header.seq_num);
+    pkt.header.ack_num = ntohl(pkt.header.ack_num);
     pkt.header.payload_len = ntohs(pkt.header.payload_len);
     
     // Checksum verification
     pkt.header.checksum = 0;
     uint16_t calculated_checksum = compute_checksum(&pkt, sizeof(Header) + pkt.header.payload_len);
-
-    pkt.header.seq_num = ntohl(pkt.header.seq_num);
-    pkt.header.ack_num = ntohl(pkt.header.ack_num);
     pkt.header.checksum = received_checksum;
 
     return (received_checksum == calculated_checksum);

@@ -77,7 +77,7 @@ Full modular implementations of sliding window buffers (Go-Back-N and Selective 
 ### 🚀 How to Run Go-Back-N (GBN) Network Transfer
 ```powershell
 # Terminal 1 - Run GBN Receiver (Port 8082)
-g++ -std=c++17 -Iinclude receiver_gbn.cpp src/gbn_window.cpp -o receiver_gbn.exe -lws2_32
+g++ -std=c++17 -Iinclude receiver_gbn.cpp src/gbn_window.cpp src/timer_manager.cpp -o receiver_gbn.exe -lws2_32
 .\receiver_gbn.exe
 
 # Terminal 2 - Run GBN Sender
@@ -88,7 +88,7 @@ g++ -std=c++17 -Iinclude sender_gbn.cpp src/gbn_window.cpp src/rtt_estimator.cpp
 ### 🚀 How to Run Selective Repeat (SR) Network Transfer
 ```powershell
 # Terminal 1 - Run SR Receiver (Port 8083)
-g++ -std=c++17 -Iinclude receiver_sr.cpp src/sr_window.cpp -o receiver_sr.exe -lws2_32
+g++ -std=c++17 -Iinclude receiver_sr.cpp src/sr_window.cpp src/timer_manager.cpp -o receiver_sr.exe -lws2_32
 .\receiver_sr.exe
 
 # Terminal 2 - Run SR Sender
