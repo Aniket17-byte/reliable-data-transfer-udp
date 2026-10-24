@@ -29,6 +29,14 @@
 
 namespace NetUtils {
 
+inline int close_socket(socket_t s) {
+#ifdef _WIN32
+    return closesocket(s);
+#else
+    return close(s);
+#endif
+}
+
 inline bool init_networking() {
 #ifdef _WIN32
     WSADATA wsa;
