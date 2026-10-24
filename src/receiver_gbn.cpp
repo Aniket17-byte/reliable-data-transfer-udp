@@ -15,12 +15,14 @@ int main(int argc, char* argv[]) {
     std::string emulator_ip = "127.0.0.1";
     uint16_t listen_port = 9002;       // Port where emulator forwards DATA
     uint16_t emulator_rev_port = 9003; // Port where emulator listens for ACKs
+    size_t window_size = 16;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--output" && i + 1 < argc) output_filename = argv[++i];
         else if (arg == "--port" && i + 1 < argc) listen_port = static_cast<uint16_t>(std::stoi(argv[++i]));
         else if (arg == "--emu-port" && i + 1 < argc) emulator_rev_port = static_cast<uint16_t>(std::stoi(argv[++i]));
+        else if (arg == "--window" && i + 1 < argc) window_size = std::stoul(argv[++i]);
     }
 
     socket_t sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -40,6 +42,8 @@ int main(int argc, char* argv[]) {
 
     uint32_t expected_seq_num = 0;
     uint8_t rx_buffer[65535];
+    sockaddr_in sender_addr{};
+    socklen_t addr_len = sizeof(sender_addr);
 
     auto send_ack = [&](uint32_t ack_num) {
         Packet ack(PacketType::ACK, 0, ack_num, nullptr, 0);
@@ -51,7 +55,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         int bytes_read = recvfrom(sock, (char*)rx_buffer, sizeof(rx_buffer), 0,
-                                  nullptr, nullptr);
+                                  (sockaddr*)&sender_addr, &addr_len);
         if (bytes_read <= 0) continue;
 
         Packet pkt;
@@ -66,18 +70,17 @@ int main(int argc, char* argv[]) {
         }
 
         if (pkt.header.type == static_cast<uint16_t>(PacketType::DATA)) {
-            if (pkt.header.seq_num == expected_seq_num) {
-                // In-order packet received
+            uint32_t seq = pkt.header.seq_num;
+            if (seq == expected_seq_num) {
+                // In-order packet received: deliver to application file
                 if (!pkt.payload.empty()) {
                     outfile.write(reinterpret_cast<const char*>(pkt.payload.data()), pkt.payload.size());
                 }
                 send_ack(expected_seq_num);
                 expected_seq_num++;
-            } else if (pkt.header.seq_num < expected_seq_num) {
-                // Duplicate packet: re-send ACK
-                send_ack(pkt.header.seq_num);
             } else {
-                // Out-of-order packet: re-send ACK for last in-order packet
+                // Out-of-order or duplicate packet:
+                // Standard GBN: ALWAYS re-acknowledge the highest consecutive in-order packet
                 if (expected_seq_num > 0) {
                     send_ack(expected_seq_num - 1);
                 }
