@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 project(ReliableDataTransferUDP CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -6,21 +6,44 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-# Core static library for Aniket's modules
-add_library(rdt_core STATIC
-    src/rtt_estimator.cpp
-    src/timer_manager.cpp
-    src/gbn_window.cpp
-    src/sr_window.cpp
-)
+# Platform-specific socket libraries
+if(WIN32)
+    set(EXTRA_LIBS ws2_32)
+else()
+    set(EXTRA_LIBS pthread)
+endif()
 
-# Test executable
-add_executable(run_tests
-    tests/test_main.cpp
-    tests/test_rtt.cpp
-    tests/test_timers.cpp
-    tests/test_gbn.cpp
-    tests/test_sr.cpp
+# 1. Channel Emulator
+add_executable(channel_emulator
+    src/channel_emulator.cpp
+    src/main_emulator.cpp
 )
+target_link_libraries(channel_emulator PRIVATE ${EXTRA_LIBS})
 
-target_link_libraries(run_tests PRIVATE rdt_core)
+# 2. Stop-and-Wait Sender & Receiver
+add_executable(sender_sw src/sender_sw.cpp)
+target_link_libraries(sender_sw PRIVATE ${EXTRA_LIBS})
+
+add_executable(receiver_sw src/receiver_sw.cpp)
+target_link_libraries(receiver_sw PRIVATE ${EXTRA_LIBS})
+
+# 3. Go-Back-N Sender & Receiver
+add_executable(sender_gbn src/sender_gbn.cpp)
+target_link_libraries(sender_gbn PRIVATE ${EXTRA_LIBS})
+
+add_executable(receiver_gbn src/receiver_gbn.cpp)
+target_link_libraries(receiver_gbn PRIVATE ${EXTRA_LIBS})
+
+# 4. Selective Repeat Sender & Receiver
+add_executable(sender_sr src/sender_sr.cpp)
+target_link_libraries(sender_sr PRIVATE ${EXTRA_LIBS})
+
+add_executable(receiver_sr src/receiver_sr.cpp)
+target_link_libraries(receiver_sr PRIVATE ${EXTRA_LIBS})
+
+# 5. Emulator Unit Tests
+add_executable(test_emulator
+    src/channel_emulator.cpp
+    tests/test_emulator.cpp
+)
+target_link_libraries(test_emulator PRIVATE ${EXTRA_LIBS})
