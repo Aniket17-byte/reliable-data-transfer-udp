@@ -40,8 +40,6 @@ int main(int argc, char* argv[]) {
 
     uint32_t expected_seq_num = 0;
     uint8_t rx_buffer[65535];
-    sockaddr_in sender_addr{};
-    socklen_t addr_len = sizeof(sender_addr);
 
     auto send_ack = [&](uint32_t ack_num) {
         Packet ack(PacketType::ACK, 0, ack_num, nullptr, 0);
@@ -53,7 +51,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         int bytes_read = recvfrom(sock, (char*)rx_buffer, sizeof(rx_buffer), 0,
-                                  (sockaddr*)&sender_addr, &addr_len);
+                                  nullptr, nullptr);
         if (bytes_read <= 0) continue;
 
         Packet pkt;
@@ -75,8 +73,11 @@ int main(int argc, char* argv[]) {
                 }
                 send_ack(expected_seq_num);
                 expected_seq_num++;
+            } else if (pkt.header.seq_num < expected_seq_num) {
+                // Duplicate packet: re-send ACK
+                send_ack(pkt.header.seq_num);
             } else {
-                // Out-of-order or duplicate packet: re-send ACK for last in-order packet
+                // Out-of-order packet: re-send ACK for last in-order packet
                 if (expected_seq_num > 0) {
                     send_ack(expected_seq_num - 1);
                 }

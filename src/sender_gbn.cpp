@@ -103,20 +103,17 @@ int main(int argc, char* argv[]) {
             window_buffer[next_seq_num] = PacketInfo{pkt, {}, 0};
             transmit(next_seq_num);
 
-            if (base == next_seq_num) {
+            if (!timer_running) {
                 timer_start = std::chrono::steady_clock::now();
                 timer_running = true;
             }
             next_seq_num++;
         }
 
-        // 2. Receive ACKs
+        // 2. Receive ACKs (do NOT use from_addr filter)
         uint8_t rx_buf[65535];
-        sockaddr_in from_addr{};
-        socklen_t from_len = sizeof(from_addr);
-
         while (true) {
-            int r = recvfrom(sock, (char*)rx_buf, sizeof(rx_buf), 0, (sockaddr*)&from_addr, &from_len);
+            int r = recvfrom(sock, (char*)rx_buf, sizeof(rx_buf), 0, nullptr, nullptr);
             if (r <= 0) break;
 
             Packet ack_pkt;
@@ -169,7 +166,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        std::this_thread::sleep_for(std::chrono::microseconds(200));
     }
 
     // 4. Send FIN to notify receiver of completion
