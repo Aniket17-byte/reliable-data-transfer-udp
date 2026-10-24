@@ -3,7 +3,7 @@
 **Student Name:** Ananya Batra  
 **Roll Number:** 24051681  
 **GitHub:** [@ananya92-arch](https://github.com/ananya92-arch) (anya916212@gmail.com)  
-**Group Partners:** Aditya Bajpai (2405704), Iti Sharma (24052005), Aniket Dwivedy (24041683)  
+**Group Partners:** Aditya Bajpai (2405704), Iti Sharma (24052005), Aniket Dwivedy (24051683)  
 **Deliverables:** C++ Channel Emulator, Automated Python Benchmark Matrix, Matplotlib Plotting Suite, and AI Disclosure (`AI-USE.md`)  
 
 ---

@@ -46,7 +46,7 @@ We validated this hypothesis across systematic sweeps of packet loss ($0\%\dots2
 |:---|:---:|:---:|:---|
 | **Aditya Bajpai** | 2405704 | [@AdityaBajpai07](https://github.com/AdityaBajpai07) | Core UDP socket architecture, sender/receiver application flow, packet format design, sequence numbering, checksum computation, file I/O operations. |
 | **Iti Sharma** | 24052005 | [@iti1503](https://github.com/iti1503) | Protocol state machine design, Stop-and-Wait ARQ, basic ACK processing, packet integrity verification logic, protocol comparative analysis, report synthesis. |
-| **Aniket Dwivedy** | 24041683 | [@Aniket17-byte](https://github.com/Aniket17-byte) | Sliding window management (Go-Back-N, Selective Repeat), selective ACK (SACK) state tracking, retransmission timers, dynamic RTT measurement, adaptive RTO (Jacobson/Karels), and Karn's algorithm. |
+| **Aniket Dwivedy** | 24051683 | [@Aniket17-byte](https://github.com/Aniket17-byte) | Sliding window management (Go-Back-N, Selective Repeat), selective ACK (SACK) state tracking, retransmission timers, dynamic RTT measurement, adaptive RTO (Jacobson/Karels), and Karn's algorithm. |
 | **Ananya Batra** | 24051681 | [@ananya92-arch](https://github.com/ananya92-arch) | Channel emulator engine (loss, duplication, reordering, delay, jitter), seed-based impairment logic, automated test matrix pipeline, performance benchmarking, plotting scripts. |
 
 ---

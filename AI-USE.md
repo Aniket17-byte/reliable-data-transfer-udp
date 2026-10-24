@@ -20,7 +20,7 @@ In strict adherence to Section 5 ("Ground rules - Use of AI tools") of the CS-30
 
 ---
 
-## 1. Aniket Dwivedy (Roll No: 24041683) — Week 3 & Week 4 Lead
+## 1. Aniket Dwivedy (Roll No: 24051683) — Week 3 & Week 4 Lead
 **Role:** Sliding Window Management (GBN & SR), Multi-Timer Manager, Dynamic RTO (Jacobson/Karels RFC 6298), Karn's Algorithm  
 **GitHub:** [@Aniket17-byte](https://github.com/Aniket17-byte) | **Email:** 24051683@kiit.ac.in  
 
@@ -33,7 +33,7 @@ In strict adherence to Section 5 ("Ground rules - Use of AI tools") of the CS-30
 | Week 4 - Day 5 | Standalone Unit Tests (`tests/test_*.cpp`) | Generating comprehensive edge case test scenarios. | Wrote full test assertions (`test_rtt`, `test_timers`, `test_gbn`, `test_sr`), fixed zero-ack edge case, verified 100% test pass. |
 
 **Statement of Authorship:**  
-I, **Aniket Dwivedy (24041683)**, confirm full understanding of all sliding window invariants, timer queues, and RTO adaptation formulas. I am prepared for live viva modifications.
+I, **Aniket Dwivedy (24051683)**, confirm full understanding of all sliding window invariants, timer queues, and RTO adaptation formulas. I am prepared for live viva modifications.
 
 ---
 
