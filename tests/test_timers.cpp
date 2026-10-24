@@ -15,8 +15,8 @@ void test_single_timer_lifecycle() {
     assert(!timer.is_expired());
     assert(timer.remaining_time().count() > 0);
 
-    // Wait until expired
-    std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    // Wait until expired (use 100ms margin for Windows timer resolution)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     assert(timer.is_running());
     assert(timer.is_expired());
     assert(timer.remaining_time().count() == 0);
@@ -32,9 +32,9 @@ void test_multi_timer_manager() {
     rdt::MultiTimerManager mgr;
     assert(mgr.active_count() == 0);
 
-    // Start timer for packet 10 (short: 30ms) and packet 20 (long: 200ms)
+    // Start timer for packet 10 (short: 30ms) and packet 20 (long: 250ms)
     mgr.start_timer(10, std::chrono::milliseconds(30));
-    mgr.start_timer(20, std::chrono::milliseconds(200));
+    mgr.start_timer(20, std::chrono::milliseconds(250));
 
     assert(mgr.is_running(10));
     assert(mgr.is_running(20));
@@ -45,7 +45,7 @@ void test_multi_timer_manager() {
     assert(earliest->count() <= 30);
 
     // Wait for packet 10 to expire
-    std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    std::this_thread::sleep_for(std::chrono::milliseconds(70));
 
     auto expired = mgr.get_expired_packets();
     assert(expired.size() == 1);
