@@ -3,7 +3,7 @@
 **Student Name:** Ananya Batra  
 **Roll Number:** 24051681  
 **GitHub:** [@ananya92-arch](https://github.com/ananya92-arch) (anya916212@gmail.com)  
-**Group Partners:** Aditya Bajpai (2405704), Iti Sharma (24052005), Aniket Dwivedy (24041683)  
+**Group Partners:** Aditya Bajpai (2405704), Iti Sharma (24052005), Aniket Dwivedy (24051683)  
 **Deliverables:** C++ Channel Emulator, Automated Python Benchmark Matrix, Matplotlib Plotting Suite, and AI Disclosure (`AI-USE.md`)  
 
 ---
@@ -130,3 +130,7 @@ Let $N$ be the sender window size, $p$ be the packet loss probability, $RTT$ be 
 To satisfy rigorous empirical validation standards:
 1. **Cryptographic Payload Verification:** Every benchmark execution computes the SHA-256 digest of the transferred payload on both sender and receiver endpoints. Any dropped packets, unhandled reordering events, or undetected bit corruptions immediately fail the automated test harness.
 2. **Deterministic Seed Control:** By configuring the 64-bit Mersenne Twister engine (`std::mt19937_64`) with explicit random seeds, all packet loss sequences, delay jitter distributions, and reordering permutations are reproducible across successive trial iterations, guaranteeing statistically sound comparative evaluations between Stop-and-Wait, Go-Back-N, and Selective Repeat.
+### Scenario 3: "How does the emulator achieve microsecond precision without pegging the CPU at 100%?"
+**Your answer:**
+> "Instead of busy-waiting (`while(now < target);`), our dispatcher thread uses `std::condition_variable::wait_until()`. This puts the thread to sleep in the OS kernel until the exact monotonic clock deadline of the earliest packet in our min-heap priority queue. This delivers microsecond accuracy with 0% idle CPU usage."
+

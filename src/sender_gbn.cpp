@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Read input file into memory
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
         std::cerr << "[Sender-GBN] Could not open file: " << filename << "\n";
@@ -54,7 +53,6 @@ int main(int argc, char* argv[]) {
     size_t total_packets = (total_file_size + MAX_PAYLOAD_SIZE - 1) / MAX_PAYLOAD_SIZE;
     if (total_packets == 0) total_packets = 1;
 
-    // Sockets
     socket_t sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     sockaddr_in bind_addr = NetUtils::create_address("0.0.0.0", sender_port);
     if (bind(sock, (sockaddr*)&bind_addr, sizeof(bind_addr)) != 0) {
@@ -70,6 +68,7 @@ int main(int argc, char* argv[]) {
     uint32_t next_seq_num = 0;
     std::chrono::steady_clock::time_point timer_start;
     bool timer_running = false;
+    uint32_t dup_ack_count = 0;
 
     std::map<uint32_t, PacketInfo> window_buffer;
 
@@ -77,8 +76,8 @@ int main(int argc, char* argv[]) {
     uint64_t retransmissions = 0;
     auto transfer_start = std::chrono::steady_clock::now();
 
-    // Helper to send packet
     auto transmit = [&](uint32_t seq) {
+        if (!window_buffer.count(seq)) return;
         auto& pinfo = window_buffer[seq];
         pinfo.send_time = std::chrono::steady_clock::now();
         pinfo.transmit_count++;
@@ -103,7 +102,7 @@ int main(int argc, char* argv[]) {
             window_buffer[next_seq_num] = PacketInfo{pkt, {}, 0};
             transmit(next_seq_num);
 
-            if (base == next_seq_num) {
+            if (!timer_running) {
                 timer_start = std::chrono::steady_clock::now();
                 timer_running = true;
             }
@@ -112,11 +111,8 @@ int main(int argc, char* argv[]) {
 
         // 2. Receive ACKs
         uint8_t rx_buf[65535];
-        sockaddr_in from_addr{};
-        socklen_t from_len = sizeof(from_addr);
-
         while (true) {
-            int r = recvfrom(sock, (char*)rx_buf, sizeof(rx_buf), 0, (sockaddr*)&from_addr, &from_len);
+            int r = recvfrom(sock, (char*)rx_buf, sizeof(rx_buf), 0, nullptr, nullptr);
             if (r <= 0) break;
 
             Packet ack_pkt;
@@ -125,8 +121,9 @@ int main(int argc, char* argv[]) {
                     ack_pkt.header.type == static_cast<uint16_t>(PacketType::ACK)) {
                     
                     uint32_t ack_num = ack_pkt.header.ack_num;
+
                     if (ack_num >= base && ack_num < next_seq_num) {
-                        // Karn's algorithm: Only measure RTT if packet was not retransmitted
+                        // Cumulative ACK: advances base
                         if (use_adaptive_rto && window_buffer.count(ack_num)) {
                             if (window_buffer[ack_num].transmit_count == 1) {
                                 auto now = std::chrono::steady_clock::now();
@@ -135,10 +132,13 @@ int main(int argc, char* argv[]) {
                             }
                         }
 
-                        // Cumulative ACK advances base
-                        while (base <= ack_num) {
-                            window_buffer.erase(base);
-                            base++;
+                        base = ack_num + 1;
+                        dup_ack_count = 0; // Reset duplicate ACK tracking
+
+                        // Clean up window_buffer for acknowledged packets
+                        auto it = window_buffer.begin();
+                        while (it != window_buffer.end() && it->first < base) {
+                            it = window_buffer.erase(it);
                         }
 
                         if (base == next_seq_num) {
@@ -147,29 +147,41 @@ int main(int argc, char* argv[]) {
                             timer_start = std::chrono::steady_clock::now();
                             timer_running = true;
                         }
+                    } else if (ack_num + 1 == base) {
+                        // Duplicate ACK received
+                        dup_ack_count++;
+                        if (dup_ack_count >= 3) {
+                            // FAST RETRANSMIT: Immediately retransmit the lost window!
+                            for (uint32_t i = base; i < next_seq_num; ++i) {
+                                transmit(i);
+                            }
+                            timer_start = std::chrono::steady_clock::now();
+                            timer_running = true;
+                            dup_ack_count = 0;
+                        }
                     }
                 }
             }
         }
 
-        // 3. Check for timeout on oldest unACKed packet
+        // 3. Timeout Check (capped at 400ms to prevent pathological 3-second delays)
         if (timer_running) {
             auto now = std::chrono::steady_clock::now();
             double elapsed_ms = std::chrono::duration<double, std::milli>(now - timer_start).count();
-            double current_rto = use_adaptive_rto ? rto_tracker.get_rto_ms() : fixed_timeout_ms;
+            double current_rto = use_adaptive_rto ? std::min(rto_tracker.get_rto_ms(), 400.0) : fixed_timeout_ms;
 
             if (elapsed_ms >= current_rto) {
-                // Timeout! Go-Back-N retransmits all packets in [base, next_seq_num - 1]
                 if (use_adaptive_rto) rto_tracker.on_timeout();
                 timer_start = std::chrono::steady_clock::now();
 
+                // Go-Back-N bulk retransmission of current in-flight window
                 for (uint32_t i = base; i < next_seq_num; ++i) {
                     transmit(i);
                 }
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        std::this_thread::sleep_for(std::chrono::microseconds(200));
     }
 
     // 4. Send FIN to notify receiver of completion
@@ -202,7 +214,6 @@ int main(int argc, char* argv[]) {
     double throughput_kbps = (total_file_size / 1024.0) / total_time_sec;
     double throughput_mbps = (total_file_size * 8.0 / 1e6) / total_time_sec;
 
-    // Structured JSON output for Python test harness
     std::cout << "{\n"
               << "  \"protocol\": \"GBN\",\n"
               << "  \"status\": \"SUCCESS\",\n"
