@@ -72,10 +72,19 @@ I, **Ananya Batra (24051681)**, confirm complete understanding of the entire cod
 ---
 
 ## 4. Iti Sharma (Roll No: 24052005) — Week 2 Lead
-**Role:** Stop-and-Wait ARQ Protocol State Machine, ACK Processing  
-**GitHub:** [@iti1503](https://github.com/iti1503)  
 
-- State machine transitions for Alternating Bit Protocol (Stop-and-Wait, $N=1$), single packet timeout retransmission, and duplicate ACK rejection.
-- All core protocol state logic authored and defended by the student.
+**Role:** Stop-and-Wait ARQ Protocol State Machine, ACK Processing & Packet Integrity
+**GitHub:** [@iti1503](https://github.com/iti1503)
+
+| Date / Milestone | Module / Task | Specific AI Assistance Requested | Human Verification & Code Authored |
+| :--- | :--- | :--- | :--- |
+| **Week 2 - Day 1** | Stop-and-Wait State Machine (`sender_saw.cpp`, `receiver_saw.cpp`) | Alternating Bit Protocol logic check ($N=1$) and transition flow verification. | Implemented core sender/receiver state machines, sequence bit toggling ($0 \leftrightarrow 1$), and duplicate ACK rejection logic. |
+| **Week 2 - Day 3** | Packet Integrity & Checksum Verification (`packet.h`) | Edge cases for bitwise checksum calculation over packet headers and payload. | Authored packet integrity validation functions, corruption detection logic, and payload extraction procedures. |
+| **Week 2 - Day 5** | Timeout Retransmission & ACK Handling | Single-packet timer management logic under packet drop conditions. | Authored single-packet timeout retransmission loop and verified stop-and-wait ACK acknowledgement processing. |
+| **Week 3 - Day 2** | GBN Integration Assistance | Window boundary checks and cumulative ACK verification in Go-Back-N. | Collaborated on integrating basic state machine logic into windowed transmission and testing base advancement. |
+| **Week 8 - Day 1** | Report Synthesis & Protocol Comparative Analysis | Structuring comparative metrics and evaluation report layouts. | Authored performance comparison sections, consolidated bench metrics, and finalized project documentation. |
+
+**Statement of Authorship:**
+*I, Iti Sharma (24052005), confirm complete understanding of the entire codebase, protocol state machine design, Stop-and-Wait ARQ mechanics, packet integrity validation, and performance analysis.*
 
 
