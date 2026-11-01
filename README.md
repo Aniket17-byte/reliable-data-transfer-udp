@@ -129,6 +129,16 @@ g++ receiver_base.cpp -o receiver_base.exe -lws2_32
 # Terminal 2 - Build & Run Sender
 g++ sender_base.cpp -o sender_base.exe -lws2_32
 .\sender_base.exe
+
+
+# 4. Iti's Stop-and-Wait ARQ Unit & Application Tests
+# Terminal 1 - Run Receiver (Stop-and-Wait)
+g++ -std=c++17 -Iinclude src/receiver_saw.cpp -o receiver_saw.exe -lws2_32
+.\receiver_saw.exe
+
+# Terminal 2 - Run Sender (Stop-and-Wait)
+g++ -std=c++17 -Iinclude src/sender_saw.cpp -o sender_saw.exe -lws2_32
+.\sender_saw.exe
 ```
 
 ### B. Compile All Executables for Benchmarks
