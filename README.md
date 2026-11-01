@@ -120,6 +120,15 @@ g++ -std=c++17 -Iinclude src/gbn_window.cpp src/rtt_estimator.cpp src/sr_window.
 # 2. Ananya's Channel Emulator Unit Tests
 g++ -std=c++17 -Iinclude tests/test_emulator.cpp src/channel_emulator.cpp -o test_emulator.exe -lws2_32
 .\test_emulator.exe
+
+# 3. Aditya's Baseline Architecture & Socket Tests
+# Terminal 1 - Build & Run Receiver
+g++ receiver_base.cpp -o receiver_base.exe -lws2_32
+.\receiver_base.exe
+
+# Terminal 2 - Build & Run Sender
+g++ sender_base.cpp -o sender_base.exe -lws2_32
+.\sender_base.exe
 ```
 
 ### B. Compile All Executables for Benchmarks
