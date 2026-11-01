@@ -152,3 +152,4 @@ Generated plots in `results/`:
 - `fig4_window_size_scaling.png` / `.pdf` — Window size scaling ($N \in \{4, 8, 16, 32, 64\}$)
 - `fig5_jitter_reordering.png` / `.pdf` — Resilience against delay jitter and out-of-order packets
 
+

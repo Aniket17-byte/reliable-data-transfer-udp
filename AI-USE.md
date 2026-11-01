@@ -70,3 +70,4 @@ I, **Ananya Batra (24051681)**, confirm complete understanding of the entire cod
 - State machine transitions for Alternating Bit Protocol (Stop-and-Wait, $N=1$), single packet timeout retransmission, and duplicate ACK rejection.
 - All core protocol state logic authored and defended by the student.
 
+
