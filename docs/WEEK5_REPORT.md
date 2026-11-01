@@ -134,3 +134,4 @@ To satisfy rigorous empirical validation standards:
 **Your answer:**
 > "Instead of busy-waiting (`while(now < target);`), our dispatcher thread uses `std::condition_variable::wait_until()`. This puts the thread to sleep in the OS kernel until the exact monotonic clock deadline of the earliest packet in our min-heap priority queue. This delivers microsecond accuracy with 0% idle CPU usage."
 
+
