@@ -54,12 +54,20 @@ I, **Ananya Batra (24051681)**, confirm complete understanding of the entire cod
 
 ---
 
-## 3. Aditya Bajpai (Roll No: 2405704) — Week 1 Lead
-**Role:** Core UDP Socket Architecture, Packet Header Format, Checksum, File I/O  
-**GitHub:** [@AdityaBajpai07](https://github.com/AdityaBajpai07)  
+### 3. Aditya Bajpai (Roll No: 2405704) — Week 1 Lead
 
-- Scaffolding of basic UDP socket wrappers, packet serialization/deserialization into 13-byte packed network headers, and file chunking loops.
-- All core networking calls and socket binding verified and authored by the student.
+**Role:** Core UDP Socket Architecture, Packet Header Format, Checksum, File I/O  
+**GitHub:** [@AdityaBajpai07](https://github.com/AdityaBajpai07) | **Email:** `2405704@kiit.ac.in`
+
+| Date / Milestone | Module / Task | Specific AI Assistance Requested | Human Verification & Code Authored |
+| :--- | :--- | :--- | :--- |
+| **Week 1 - Day 1** | Packet Layout & Checksum<br>`( packet.h )` | Cross-platform `#pragma pack(push, 1)` structure alignment and 16-bit 1's complement checksum formula. | Authored 13-byte `Header` & `Packet` structures, byte-order conversion functions (`htons`/`ntohs`, `htonl`/`ntohl`), and verified checksum validation logic. |
+| **Week 1 - Day 3** | Sender Baseline<br>`( sender_base.cpp )` | Winsock `WSAStartup` cleanup boilerplate for Windows compilation. | Developed 1024-byte binary file chunking, packet header serialization, UDP socket creation, and destination address binding. |
+| **Week 1 - Day 4** | Receiver Baseline<br>`( receiver_base.cpp )` | Non-blocking socket timeout syntax vs POSIX socket options. | Implemented socket `bind()` to port `8080`, payload deserialization, checksum verification filtering, and binary output file writing. |
+| **Week 1 - Day 5** | Documentation & Viva Prep | Formatting project execution instructions and README markdown structure. | Tested local end-to-end loopback execution, verified file integrity between `test_input.txt` and `test_output.txt`, and pushed baseline to repository. |
+
+**Statement of Authorship:**  
+**I, Aditya Bajpai (2405704)**, confirm full understanding of packet header serialization, socket binding, binary file I/O operations, and 16-bit Internet Checksum calculations. I am prepared for live viva modifications.
 
 ---
 
